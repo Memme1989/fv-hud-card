@@ -2,7 +2,8 @@
 
 Card Lovelace a tutta pagina per Home Assistant: monitoraggio del **fotovoltaico** in stile HUD, con flusso di energia animato, indicatori con soglie colorate, storico e pannello di controllo dell'inverter **Axpert** (o di qualsiasi inverter che esponga entità `select`, `number` e `switch`).
 
-> Screenshot: aggiungi qui `docs/screenshot.png`
+![FV HUD Card, singolo inverter](screenshot-singolo-inverter.png)
+![FV HUD Card, multi inverter](screenshot-multi-inverter.png)
 
 ## Funzioni
 
