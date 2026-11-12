@@ -118,6 +118,12 @@ Apri una [issue](https://github.com/Memme1989/fv-hud-card/issues) indicando vers
 
 FV HUD Card is a full-page Lovelace card for Home Assistant that shows a photovoltaic system as an animated HUD: energy flow (solar, inverter, grid, up to two batteries, up to 10 loads), colour-coded indicators, history on tap, a multi-series power chart, and an inverter control panel (selects, numbers, switches, readings) with an optional PIN. Install via HACS as a custom repository (category *Dashboard*) and configure everything from the visual editor. The interface is currently in Italian.
 
+## Supporta il progetto
+
+Se la card ti è utile, puoi offrirmi un caffè:
+
+[![Dona con PayPal](https://img.shields.io/badge/Dona-PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.me/Memme198926)
+
 ## Licenza
 
 MIT, vedi [LICENSE](LICENSE).
