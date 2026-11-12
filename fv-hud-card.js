@@ -1,11 +1,11 @@
 /* FV HUD Card — Fotovoltaico a tutta pagina: flusso di energia con 8 utenze, indicatori con soglie e storico,
  * impostazioni inverter protette da password, storico a più serie.
- * Modalità singolo inverter (1-2 MPPT, 1-2 batterie) o multi inverter (fino a 3, una fase ciascuno);
+ * Modalità singolo inverter (1-4 MPPT, 1-2 batterie) o multi inverter (fino a 3, una fase ciascuno, 1-4 MPPT ciascuno);
  * ogni cerchio / utenza apre un popup con il grafico (potenza, tensione, corrente, SOC).
- * Installazione: HACS (consigliata) oppure risorsa JavaScript module /local/fv-hud-card.js
+ * Installazione: HACS / Marketplace (consigliata) oppure risorsa JavaScript module /local/fv-hud-card.js
  * Uso:  type: custom:fv-hud-card  (si configura dall'editor visuale)
  */
-const FV_VERSION = '1.23.0';
+const FV_VERSION = '1.24.0';
 
 const FV_P = {
   sol: 'M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0',
@@ -255,7 +255,7 @@ class FvHudCard extends HTMLElement {
   static getStubConfig() {
     return {
       title: 'Fotovoltaico', subtitle: 'ENERGIA',
-      mode: 'single', inverters: [], solar: { name: 'Solare', entity: '', sub: 'PV1 + PV2', voltage_entity: '', current_entity: '', mppt2: { name: 'MPPT 2', entity: '', voltage_entity: '', current_entity: '' } }, grid: { name: 'Rete Enel', entity: '', voltage_entity: '' },
+      mode: 'single', inverters: [], solar: { name: 'Solare', entity: '', sub: 'PV1 + PV2', voltage_entity: '', current_entity: '', mppt2: { name: 'MPPT 2', entity: '', voltage_entity: '', current_entity: '' }, mppt3: { name: 'MPPT 3', entity: '', voltage_entity: '', current_entity: '' }, mppt4: { name: 'MPPT 4', entity: '', voltage_entity: '', current_entity: '' } }, grid: { name: 'Rete Enel', entity: '', voltage_entity: '' },
       battery: { name: 'Batteria', entity: '', soc_entity: '', charging_positive: true, capacity_kwh: '', min_soc: 20 }, battery2: { name: 'Batteria 2', entity: '', soc_entity: '', charging_positive: true }, home: { name: 'Casa', entity: '' },
       loads: [], indicators: [], axpert: { title: 'Inverter', controls: [], switches: [], readings: [], lock: { enabled: false, pin: '', seconds: 30, protect_controls: true, protect_switches: true } },
       history: { title: 'STORICO POTENZE', series: [], ranges: ['24h', '7g', '30g'], height: 260 },
@@ -270,7 +270,7 @@ class FvHudCard extends HTMLElement {
     ['solar', 'grid', 'battery', 'battery2', 'home'].forEach((k) => { c[k] = Object.assign({}, d[k], c[k] || {}); });
     c.loads = Array.isArray(c.loads) ? c.loads.slice(0, FV_MAX_LOADS) : [];
     c.mode = c.mode === 'multi' ? 'multi' : 'single';
-    c.solar.mppt2 = Object.assign({}, d.solar.mppt2, c.solar.mppt2 || {});
+    c.solar.mppt2 = Object.assign({}, d.solar.mppt2, c.solar.mppt2 || {}); c.solar.mppt3 = Object.assign({}, d.solar.mppt3, c.solar.mppt3 || {}); c.solar.mppt4 = Object.assign({}, d.solar.mppt4, c.solar.mppt4 || {});
     c.inverters = (Array.isArray(c.inverters) ? c.inverters : []).slice(0, FV_MAX_INV).map((v) => { v = v && typeof v === 'object' ? v : {}; ['phase', 'battery', 'home'].forEach((k) => { if (!v[k] || typeof v[k] !== 'object') v[k] = {}; }); if (!Array.isArray(v.mppt)) v.mppt = []; v.loads = Array.isArray(v.loads) ? v.loads.slice(0, FV_MAX_LOADS_INV) : []; v.axpert = Object.assign({ controls: [], switches: [], readings: [] }, v.axpert && typeof v.axpert === 'object' ? v.axpert : {}); ['controls', 'switches', 'readings'].forEach((k) => { if (!Array.isArray(v.axpert[k])) v.axpert[k] = []; }); return v; });
     c.indicators = Array.isArray(c.indicators) ? c.indicators.slice(0, FV_MAX_IND) : [];
     c.axpert = Object.assign({}, d.axpert, c.axpert || {}); c.axpert.lock = Object.assign({}, d.axpert.lock, c.axpert.lock || {});
@@ -300,7 +300,7 @@ class FvHudCard extends HTMLElement {
 
   /* ---------- dati ---------- */
   _flowIds() {
-    const c = this._config; const a = [c.solar.entity, c.solar.mppt2.entity, c.grid.entity, c.grid.voltage_entity, c.grid.frequency_entity, c.battery.entity, c.battery.soc_entity, c.battery2.entity, c.battery2.soc_entity, c.home.entity];
+    const c = this._config; const a = [c.solar.entity, c.solar.mppt2.entity, c.solar.mppt3.entity, c.solar.mppt4.entity, c.grid.entity, c.grid.voltage_entity, c.grid.frequency_entity, c.battery.entity, c.battery.soc_entity, c.battery2.entity, c.battery2.soc_entity, c.home.entity];
     c.loads.forEach((l) => { a.push(l.entity, l.sub_entity, l.soc_entity); (l.sub_loads || []).forEach((x) => x && a.push(x.entity)); });
     c.inverters.forEach((v) => { a.push(v.phase.entity, v.phase.voltage_entity, v.battery.entity, v.battery.soc_entity, v.home.entity); (v.mppt || []).forEach((m) => m && a.push(m.entity)); v.loads.forEach((l) => { a.push(l.entity, l.soc_entity); (l.sub_loads || []).forEach((x) => x && a.push(x.entity)); }); });
     return a;
@@ -330,7 +330,7 @@ class FvHudCard extends HTMLElement {
 
   _flowData() {
     const c = this._config; const n = (v) => (v == null ? 0 : v);
-    const dual = this._mppt2On(); const m1 = Math.max(0, n(this._pw(c.solar.entity))); const m2 = dual ? Math.max(0, n(this._pw(c.solar.mppt2.entity))) : 0; const pv = m1 + m2;
+    const sm = this._smp(); const dual = sm.length > 1; const ms = sm.map((x) => Math.max(0, n(this._pw(x.cfg.entity)))); const m1 = ms[0] || 0; const m2 = ms[1] || 0; const pv = ms.reduce((a, x) => a + x, 0);
     let g = n(this._pw(c.grid.entity)); if (c.grid.import_positive === false) g = -g; const grid = Math.max(0, g);
     const bats = [c.battery].concat(this._bat2On() ? [c.battery2] : []).map((bc) => { let bw = n(this._pw(bc.entity)); if (bc.charging_positive === false) bw = -bw; return { b: bw, soc: this._raw(bc.soc_entity) }; });
     const b = bats.reduce((a, x) => a + x.b, 0); const socs = bats.map((x) => x.soc).filter((x) => x != null);
@@ -340,7 +340,7 @@ class FvHudCard extends HTMLElement {
     const f = { sc: pv - sb, sb, rb, rc: Math.max(0, grid - rb), bc: dis };
     const calc = f.sc + f.bc + f.rc; const hw = c.home.entity ? this._pw(c.home.entity) : null;
     const loads = c.loads.map((l) => ({ w: Math.max(0, n(this._pw(l.entity))) }));
-    return { pv, m1, m2, dual, g, grid, b, bats, soc, f, home: hw != null ? hw : calc, loads, volt: this._raw(c.grid.voltage_entity), vu: this._unit(c.grid.voltage_entity) || 'V' };
+    return { pv, m1, m2, ms, dual, g, grid, b, bats, soc, f, home: hw != null ? hw : calc, loads, volt: this._raw(c.grid.voltage_entity), vu: this._unit(c.grid.voltage_entity) || 'V' };
   }
 
   /* ---------- struttura ---------- */
@@ -387,6 +387,7 @@ class FvHudCard extends HTMLElement {
   }
   _S(a, b) { const m = (a[0] + b[0]) / 2; return `M${a[0]} ${a[1]}C${m} ${a[1]} ${m} ${b[1]} ${b[0]} ${b[1]}`; }
   _V(a, b) { const m = (a[1] + b[1]) / 2; return `M${a[0]} ${a[1]}C${a[0]} ${m} ${b[0]} ${m} ${b[0]} ${b[1]}`; }
+  _smp() { const s = this._config.solar; const nm0 = s.name && s.name !== 'Solare' ? s.name : ''; const L = [{ cfg: s, i: 0, name: nm0 || 'MPPT 1' }]; [['mppt2', 7, 'MPPT 2'], ['mppt3', 8, 'MPPT 3'], ['mppt4', 9, 'MPPT 4']].forEach(([k, i, nm]) => { const m = s[k]; if (m && m.entity) L.push({ cfg: m, i, name: m.name || nm }); }); return L; }
   _mppt2On() { const m = this._config.solar.mppt2; return !!(m && m.entity); }
   _bat2On() { const b = this._config.battery2; return !!(b && (b.entity || b.soc_entity)); }
   _batName(i) { const b = i ? this._config.battery2 : this._config.battery; if (!this._bat2On()) return b.name || 'Batteria'; return b.name && b.name !== 'Batteria' ? b.name : 'Batteria ' + (i + 1); }
@@ -525,6 +526,9 @@ class FvHudCard extends HTMLElement {
     const P = nar
       ? { sol: [132, cy - 150], m: [[92, cy - 150], [172, cy - 150]], rete: [42, cy], inv: [132, cy], casa: [216, cy], b: nb === 2 ? [[92, cy + 148], [172, cy + 148]] : [[132, cy + 148]] }
       : { sol: [360, 120], m: [[290, 120], [430, 120]], rete: [100, 340], inv: [360, 340], casa: [620, 340], b: nb === 2 ? [[290, 560], [430, 560]] : [[360, 560]] };
+    const sm = this._smp(); const nM = dual ? d.ms.length : 1; const msz = nar && nM >= 4 ? 50 : sz;
+    const MX = nar ? (nM === 2 ? [92, 172] : nM === 3 ? [62, 132, 202] : [36, 94, 152, 210]) : (nM === 2 ? [290, 430] : nM === 3 ? [220, 360, 500] : [80, 220, 360, 500]);
+    P.m = MX.map((x) => [x, nar ? cy - (nM >= 3 ? 172 : 150) : 120]);
     const bcol = d.b < -5 ? C.red : C.bat; const iw = nar ? 74 : 150; const ih = nar ? 102 : 170;
     const lp = c.loads.map((_, k) => nar ? [322, n > 1 ? 45 + k * step : cy] : [1120, n > 1 ? Math.round(m0 + k * (680 - 2 * m0) / (n - 1)) : 340]);
     const E = [];
@@ -532,7 +536,7 @@ class FvHudCard extends HTMLElement {
     const bTop = (p) => [p[0], p[1] - sz / 2];
     if (dual) {
       const jn = [P.inv[0], iTop[1] - (nar ? 34 : 60)];
-      E.push(this._edge(this._L(jn, iTop), d.pv, C.sol), this._edge(this._V([P.m[0][0], P.m[0][1] + sz / 2], jn), d.m1, C.sol), this._edge(this._V([P.m[1][0], P.m[1][1] + sz / 2], jn), d.m2, C.sol));
+      E.push(this._edge(this._L(jn, iTop), d.pv, C.sol)); d.ms.forEach((w, k) => E.push(this._edge(this._V([P.m[k][0], P.m[k][1] + msz / 2], jn), w, C.sol)));
     } else E.push(this._edge(this._L([P.sol[0], P.sol[1] + sz / 2], iTop), d.pv, C.sol));
     /* rete: in prelievo la linea va verso l'inverter, in immissione verso la rete */
     const ra = nar ? [73, cy] : [150, 340]; const rb = nar ? [112, cy] : [285, 340];
@@ -549,7 +553,7 @@ class FvHudCard extends HTMLElement {
       E.push(this._edge(this._L([P.casa[0], P.casa[1] - cr], [P.casa[0], tip]), un, '#ff6fb5', nar ? undefined : { sw: 3, dw: 5 }));
       unTri = this._unHtml([P.casa[0], ty], W, H, sz2, { val: this._fw(un), pct: Math.round(un / Math.max(1, d.home) * 100) + ' %', on, fs: nar ? 10 : 13, ps: nar ? 8 : 10, ls: nar ? 8 : 11.5, gr: nar ? 6 : 10 });
     }
-    const holes = (dual ? P.m : [P.sol]).concat([P.rete]).concat(P.b).map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="${sz / 2 + 2}" fill="#000"/>`).join('') + `<circle cx="${P.casa[0]}" cy="${P.casa[1]}" r="${cs / 2 + 2}" fill="#000"/>`
+    const holes = (dual ? P.m : [P.sol]).map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="${(dual ? msz : sz) / 2 + 2}" fill="#000"/>`).join('') + [P.rete].concat(P.b).map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="${sz / 2 + 2}" fill="#000"/>`).join('') + `<circle cx="${P.casa[0]}" cy="${P.casa[1]}" r="${cs / 2 + 2}" fill="#000"/>`
       + `<rect x="${P.inv[0] - iw / 2 - 1}" y="${P.inv[1] - ih / 2 - 1}" width="${iw + 2}" height="${ih + 2}" rx="${nar ? 17 : 22}" fill="#000"/>`
       + (nar ? lp.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="${lr + 2}" fill="#000"/>`).join('') : lp.map((p) => `<rect x="${p[0] - 147}" y="${p[1] - ldH / 2}" width="294" height="${ldH}" rx="18" fill="#000"/>`).join(''));
     const volt = d.volt != null ? this._f(d.volt) + ' ' + d.vu : '';
@@ -559,10 +563,10 @@ class FvHudCard extends HTMLElement {
       return this._nodeHtml(P.b[i], W, H, sz, { col, ic: 'bat', val: bt.soc != null ? this._f(bt.soc, 0) + ' %' : '—', sub: cfg.entity ? (bt.b >= 0 ? '+' : '−') + this._fw(Math.abs(bt.b)) : '', lab: nm, active: !!cfg.entity, src: cfg.entity ? { kind: 'src', i: ip, met: 'w' } : (cfg.soc_entity ? { kind: 'src', i: ip, met: 's' } : null),
         split: cfg.entity && cfg.soc_entity ? { top: { kind: 'src', i: ip, met: 's' }, topLab: nm + ' carica', bot: { kind: 'src', i: ip, met: 'w' }, botLab: nm + ' potenza' } : null });
     };
-    const solNode = (pos, val, act, lab, src) => this._nodeHtml(pos, W, H, sz, { col: C.sol, ic: 'sol', val: this._fw(val), sub: dual ? '' : (c.solar.sub || ''), lab, labTop: true, active: act, src });
+    const solNode = (pos, val, act, lab, src) => this._nodeHtml(pos, W, H, msz, { col: C.sol, ic: 'sol', val: this._fw(val), sub: dual ? '' : (c.solar.sub || ''), lab, labTop: true, active: act, src });
     const solName = c.solar.name && c.solar.name !== 'Solare' ? c.solar.name : '';
     const solNodes = dual
-      ? solNode(P.m[0], d.m1, d.m1 > 5, solName || 'MPPT 1', { kind: 'src', i: 0 }) + solNode(P.m[1], d.m2, d.m2 > 5, c.solar.mppt2.name || 'MPPT 2', { kind: 'src', i: 7 })
+      ? d.ms.map((w, k) => solNode(P.m[k], w, w > 5, sm[k].name, { kind: 'src', i: sm[k].i })).join('')
       : this._nodeHtml(P.sol, W, H, sz, { col: C.sol, ic: 'sol', val: this._fw(c.solar.entity ? d.pv : null), sub: c.solar.sub || '', lab: c.solar.name || 'Solare', labTop: true, active: d.pv > 5, src: c.solar.entity ? { kind: 'src', i: 0 } : null });
     const nodes = solNodes
       + this._nodeHtml(P.rete, W, H, sz, { col: C.rete, ic: 'rete', val: (d.g < -5 ? '−' : '') + this._fw(c.grid.entity ? Math.abs(d.g) : null), sub: volt, lab: c.grid.name || 'Rete', active: Math.abs(d.g) > 5, src: c.grid.entity ? { kind: 'src', i: 1 } : null })
@@ -582,7 +586,7 @@ class FvHudCard extends HTMLElement {
     this._$('chips').innerHTML = chip((dual ? 'SOLARE' : (c.solar.name || 'SOLARE')).toUpperCase() + ' ' + this._fw(c.solar.entity ? d.pv : null), C.sol) + chip('RETE ' + (d.g < -5 ? '↑ ' : '↓ ') + this._fw(c.grid.entity ? Math.abs(d.g) : null), C.rete) + chip('BATTERIA ' + (d.soc != null ? this._f(d.soc, 0) + ' %' : '—'), bcol) + this._etaChip(d, c.battery.capacity_kwh, c.battery.min_soc);
   }
   /* ---------- multi inverter ---------- */
-  _mppts(iv) { return (iv.mppt || []).filter((m) => m && m.entity).slice(0, 2); }
+  _mppts(iv) { return (iv.mppt || []).filter((m) => m && m.entity).slice(0, 4); }
   _multiData() {
     const c = this._config; const n = (v) => (v == null ? 0 : v);
     const inv = c.inverters.map((iv) => {
@@ -623,11 +627,13 @@ class FvHudCard extends HTMLElement {
       nd(nar ? [88, c0] : [250, c0], nar ? 52 : 96, { col: C.rete, ic: 'rete', val: this._fw(v.pw), sub: v.v != null ? this._f(v.v, 1) + ' ' + v.vu : '', lab: ph.name || 'Fase L' + (i + 1), active: Math.abs(v.pw) > 5, fs: nar ? 11 : 16, ss: nar ? 7.5 : 9.5, is: nar ? 14 : 20, src: { kind: 'mx', key: 'f-' + i } });
       if (nar) { eb([5, c0], [62, c0], v.pw, C.rete); eb([114, c0], [138, c0], v.pw, C.rete); }
       else { E.push(v.pw >= 0 ? this._edge(this._S([140, cm], [202, c0]), v.pw, C.rete) : this._edge(this._S([202, c0], [140, cm]), -v.pw, C.rete)); eb([298, c0], [379, c0], v.pw, C.rete); }
-      const dx = nar ? 30 : 45; const ms = this._mppts(iv); const msz = nar ? 50 : 64; const my = c0 - (nar ? 95 : 125);
+      const ms = this._mppts(iv); const nM = ms.length; const msz = nar ? (nM >= 4 ? 44 : nM === 3 ? 48 : 50) : 64; const my = c0 - (nar ? 95 : 125);
+      const mcx = nar ? (nM >= 4 ? 160 : nM === 3 ? 176 : IX) : IX; const mgp = nar ? (nM >= 4 ? 46 : nM === 3 ? 54 : 60) : 90;
       v.ms.forEach((m, j) => {
-        const px = ms.length === 1 ? IX : (j ? IX + dx : IX - dx);
-        nd([px, my], msz, { col: C.sol, ic: 'sol', val: this._fw(m.w), sub: '', lab: ms[j].name || 'MPPT ' + (j + 1), labTop: true, active: m.w > 5, fs: nar ? 11 : 12.5, ss: 8, is: nar ? 14 : 16, src: { kind: 'mx', key: 'm-' + i + '-' + j } });
-        E.push(this._edge(this._L([px, my + msz / 2], [px, c0 - (nar ? 40 : 61)]), m.w, C.sol));
+        const px = nM === 1 ? IX : nM === 2 ? (j ? IX + (nar ? 30 : 45) : IX - (nar ? 30 : 45)) : mcx + (j - (nM - 1) / 2) * mgp; const tx = nM <= 2 ? px : IX + (px - mcx) * (nar ? .65 : .45);
+        nd([px, my], msz, { col: C.sol, ic: 'sol', val: this._fw(m.w), sub: '', lab: ms[j].name || 'MPPT ' + (j + 1), labTop: true, active: m.w > 5, fs: nar ? (nM >= 4 ? 9.5 : 11) : 12.5, ss: 8, is: nar ? (nM >= 4 ? 12 : 14) : 16, src: { kind: 'mx', key: 'm-' + i + '-' + j } });
+        const y1 = my + msz / 2; const y2 = c0 - (nar ? 40 : 61); const ym = (y1 + y2) / 2;
+        E.push(this._edge(tx === px ? this._L([px, y1], [px, y2]) : 'M' + px + ' ' + y1 + ' C' + px + ' ' + ym + ' ' + tx + ' ' + ym + ' ' + tx + ' ' + y2, m.w, C.sol));
       });
       if (v.bon) {
         const by = c0 + (nar ? 98 : 135); const bs = nar ? 62 : 72; const bcol = v.bw < 0 ? C.red : C.bat; const bnm = (iv.battery && iv.battery.name) || 'Batteria ' + (i + 1); const y0 = c0 + (nar ? 40 : 61);
@@ -945,8 +951,8 @@ class FvHudCard extends HTMLElement {
     }
     if (s.kind === 'src') {
       const bi = s.i === 5 ? 1 : 0; const bcfg = bi ? c.battery2 : c.battery;
-      if (s.i === 0) { const nm = this._mppt2On() ? (c.solar.name && c.solar.name !== 'Solare' ? c.solar.name : 'MPPT 1') : (c.solar.name || 'Solare'); return this._mkSpec(nm, this._mppt2On() ? 'INGRESSO SOLARE' : (c.solar.sub || ''), C.sol, this._solMets(c.solar)); }
-      if (s.i === 7) return this._mkSpec(c.solar.mppt2.name || 'MPPT 2', 'INGRESSO SOLARE', C.sol, this._solMets(c.solar.mppt2));
+      if (s.i === 0) { const nm = this._smp().length > 1 ? (c.solar.name && c.solar.name !== 'Solare' ? c.solar.name : 'MPPT 1') : (c.solar.name || 'Solare'); return this._mkSpec(nm, this._smp().length > 1 ? 'INGRESSO SOLARE' : (c.solar.sub || ''), C.sol, this._solMets(c.solar)); }
+      if (s.i >= 7 && s.i <= 9) { const mk = { 7: 'mppt2', 8: 'mppt3', 9: 'mppt4' }[s.i]; return this._mkSpec(c.solar[mk].name || 'MPPT ' + (s.i - 5), 'INGRESSO SOLARE', C.sol, this._solMets(c.solar[mk])); }
       if (s.i === 1) return this._mkSpec(c.grid.name || 'Rete', this._flowData().volt != null ? this._f(this._flowData().volt) + ' ' + this._flowData().vu : '', C.rete, [this._pmet(c.grid.entity, { bi: this._biGrid(), neg: c.grid.import_positive === false }), this._vmet(c.grid.voltage_entity)]);
       if (s.i === 3) return this._mkSpec(c.home.name || 'Casa', '', C.casa, [this._pmet(c.home.entity)]);
       if (s.i === 2 || s.i === 5) return this._mkSpec(this._batName(bi), '', C.bat, this._batMets(bcfg));
@@ -1279,7 +1285,7 @@ class FvHudCardEditor extends HTMLElement {
       return `<div class="sub"><h4>Sottocarichi (${sl.length}/${FV_MAX_SUB})</h4><div class="hint">Dettagliano questa utenza: sul quadrato appare un pulsante che apre l'elenco dei sottocarichi con il loro storico.</div>${items}<div class="bar"><button type="button" class="b pri" data-ea="add" data-arr="${base}.sub_loads" ${sl.length >= FV_MAX_SUB ? 'disabled' : ''}>+ Aggiungi sottocarico</button></div></div>`; };
     const src = (k, label, fields) => this._det('src.' + k, label, fields);
     const sources = src('solar', 'Solare', this._pick('Potenza prodotta (W o kW) — con il secondo MPPT compilato è quella dell\'MPPT 1', 'solar.entity', P) + `<div class="g2">${this._txt('Nome', 'solar.name', 'Solare')}${this._txt('Testo sotto il valore', 'solar.sub', 'PV1 + PV2')}</div>` + this._pick('Tensione di stringa (V, opzionale: appare nel grafico)', 'solar.voltage_entity', P) + this._pick('Corrente di stringa (A, opzionale: se vuota la calcolo da potenza / tensione)', 'solar.current_entity', P)
-        + this._det('src.mppt2', 'Secondo MPPT (opzionale)', this._pick('Potenza dell\'MPPT 2 (W o kW)', 'solar.mppt2.entity', P) + this._txt('Nome', 'solar.mppt2.name', 'MPPT 2') + this._pick('Tensione di stringa (V, opzionale)', 'solar.mppt2.voltage_entity', P) + this._pick('Corrente di stringa (A, opzionale)', 'solar.mppt2.current_entity', P) + '<div class="hint">Con il secondo MPPT la card mostra due cerchi affiancati che si uniscono in una sola linea verso l\'inverter; il totale solare è la somma.</div>'))
+        + [['mppt2', 'Secondo', 2], ['mppt3', 'Terzo', 3], ['mppt4', 'Quarto', 4]].map(([k, w, nn]) => this._det('src.' + k, w + ' MPPT (opzionale)', this._pick('Potenza dell\'MPPT ' + nn + ' (W o kW)', 'solar.' + k + '.entity', P) + this._txt('Nome', 'solar.' + k + '.name', 'MPPT ' + nn) + this._pick('Tensione di stringa (V, opzionale)', 'solar.' + k + '.voltage_entity', P) + this._pick('Corrente di stringa (A, opzionale)', 'solar.' + k + '.current_entity', P) + (k === 'mppt2' ? '<div class="hint">Con più MPPT la card mostra i cerchi affiancati che si uniscono in una sola linea verso l\'inverter; il totale solare è la somma (fino a 4 MPPT).</div>' : ''))).join(''))
       + src('grid', 'Rete', this._pick('Potenza prelevata dalla rete (W o kW)', 'grid.entity', P) + this._pick('Tensione di rete (opzionale)', 'grid.voltage_entity', P) + this._pick('Frequenza di rete in Hz (opzionale, mostrata nel riquadro inverter)', 'grid.frequency_entity', P) + this._txt('Nome', 'grid.name', 'Rete Enel') + this._chk('Potenza positiva = prelievo dalla rete (togli la spunta se il tuo sensore è al contrario). L\'immissione in rete è negativa e il grafico la mostra sotto lo zero.', 'grid.import_positive', 'boolf', c.grid.import_positive !== false))
       + src('battery', 'Batteria', this._pick('Potenza della batteria (W o kW)', 'battery.entity', P) + this._pick('Carica della batteria (%)', 'battery.soc_entity', P) + this._txt('Nome', 'battery.name', 'Batteria 1') + `<div class="g2">${this._numf('Capacità totale del pacco (kWh)', 'battery.capacity_kwh', 'es. 10,24')}${this._numf('Carica residua desiderata (%)', 'battery.min_soc', 20)}</div><div class="hint">La capacità è quella di tutto il pacco (somma delle batterie). Con la capacità impostata compare il tempo stimato: in carica, quanto manca al 100 %; in scarica, quanto resta prima della carica residua desiderata.</div>`
         + this._chk('Potenza positiva = in carica (togli la spunta se il tuo sensore è al contrario)', 'battery.charging_positive', 'boolf', c.battery.charging_positive !== false))
@@ -1318,7 +1324,7 @@ class FvHudCardEditor extends HTMLElement {
       return this._det('inverters.' + i, `${i + 1} · ${v.name || 'Inverter ' + (i + 1)}`,
         this._txt('Nome', `${b}.name`, 'Inverter ' + (i + 1))
         + `<div class="sub"><h4>Fase di rete</h4>${this._pick('Potenza della fase (W o kW)', `${b}.phase.entity`, P)}${this._pick('Tensione della fase (opzionale)', `${b}.phase.voltage_entity`, P)}${this._txt('Nome', `${b}.phase.name`, 'Fase L' + (i + 1))}${this._chk('Potenza positiva = prelievo dalla rete (togli la spunta se il tuo sensore è al contrario: l\'immissione in rete diventa negativa nel grafico)', `${b}.phase.import_positive`, 'boolf', ph.import_positive !== false)}</div>`
-        + `<div class="sub"><h4>Solare (MPPT)</h4>${mp(0)}${mp(1)}</div>`
+        + `<div class="sub"><h4>Solare (MPPT)</h4>${mp(0)}${mp(1)}${mp(2)}${mp(3)}</div>`
         + `<div class="sub"><h4>Batteria</h4>${this._pick('Potenza della batteria (W o kW)', `${b}.battery.entity`, P)}${this._pick('Carica della batteria (%)', `${b}.battery.soc_entity`, P)}${this._txt('Nome', `${b}.battery.name`, 'Batteria ' + (i + 1))}<div class="g2">${this._numf('Capacità (kWh)', `${b}.battery.capacity_kwh`, 'es. 5,12')}${this._numf('Carica residua desiderata (%)', `${b}.battery.min_soc`, 20)}</div>${this._chk('Potenza positiva = in carica (togli la spunta se il tuo sensore è al contrario)', `${b}.battery.charging_positive`, 'boolf', bt.charging_positive !== false)}</div>`
         + `<div class="sub"><h4>Casa</h4>${this._pick('Consumo della casa (opzionale: se vuoto lo calcolo dai flussi)', `${b}.home.entity`, P)}${this._txt('Nome', `${b}.home.name`, 'Casa ' + (i + 1))}</div>`
         + `<div class="sub"><h4>Utenze (${nl}/${FV_MAX_LOADS_INV})</h4>${ls}${add(b + '.loads', '+ Aggiungi utenza', nl, FV_MAX_LOADS_INV)}</div>`

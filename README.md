@@ -4,13 +4,17 @@ Card Lovelace a tutta pagina per Home Assistant: monitoraggio del **fotovoltaico
 
 N.B. LA CARD È SVILUPPATA PER ESSERE INSERITA IN UNA SCHEDA A VISUALIZZAZIONE SINGOLA
 
+Se la card ti è utile, puoi offrirmi un caffè:
+
+[![Dona con PayPal](https://img.shields.io/badge/Dona-PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.me/Memme198926)
+
 ![FV HUD Card, singolo inverter](https://raw.githubusercontent.com/Memme1989/fv-hud-card/main/screenshot-singolo-inverter.png)
 ![FV HUD Card, multi inverter](https://raw.githubusercontent.com/Memme1989/fv-hud-card/main/screenshot-multi-inverter.png)
 
 ## Funzioni
 
 - **Flusso di energia animato**: solare → inverter → casa, rete, una o due batterie e fino a 10 utenze, con la quota di ciascuna sul consumo.
-- **Singolo o multi inverter**: modalità con un inverter (1-2 MPPT, 1-2 batterie) oppure fino a 3 inverter, uno per fase.
+- **Singolo o multi inverter**: modalità con un inverter (fino a 4 MPPT, 1-2 batterie) oppure fino a 3 inverter, uno per fase, ciascuno con fino a 4 MPPT.
 - **Popup con grafico** per ogni cerchio e utenza: potenza, tensione, corrente e carica (SOC).
 - **Tempo stimato** di carica completa o di scarica fino alla carica residua desiderata (imposta la capacità del pacco batterie).
 - **Indicatori** (fino a 18): anelli o tessere con barra, colori a soglie, scale che attraversano lo zero (es. correnti).
@@ -110,7 +114,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.23.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.24.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
@@ -119,12 +123,6 @@ Apri una [issue](https://github.com/Memme1989/fv-hud-card/issues) indicando vers
 ## English
 
 FV HUD Card is a full-page Lovelace card for Home Assistant that shows a photovoltaic system as an animated HUD: energy flow (solar, inverter, grid, up to two batteries, up to 10 loads), colour-coded indicators, history on tap, a multi-series power chart, and an inverter control panel (selects, numbers, switches, readings) with an optional PIN. Install via HACS as a custom repository (category *Dashboard*) and configure everything from the visual editor. The interface is currently in Italian.
-
-## Supporta il progetto
-
-Se la card ti è utile, puoi offrirmi un caffè:
-
-[![Dona con PayPal](https://img.shields.io/badge/Dona-PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.me/Memme198926)
 
 ## Licenza
 
