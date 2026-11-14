@@ -13,8 +13,10 @@ Se la card ti è utile, puoi offrirmi un caffè:
 
 ## Funzioni
 
-- **Flusso di energia animato**: solare → inverter → casa, rete, una o due batterie e fino a 10 utenze, con la quota di ciascuna sul consumo.
-- **Singolo o multi inverter**: modalità con un inverter (fino a 4 MPPT, 1-2 batterie) oppure fino a 3 inverter, uno per fase, ciascuno con fino a 4 MPPT.
+- **Flusso di energia animato**: solare → inverter → casa, rete, una o due batterie e le utenze, con la quota di ciascuna sul consumo e il triangolo dei **carichi non monitorati**.
+- **Singolo o multi inverter**: modalità con un inverter (fino a 4 MPPT, 1-2 batterie, **10 utenze**) oppure fino a 3 inverter, uno per fase, ciascuno con fino a 4 MPPT e **12 utenze** (36 in totale). Supporta anche una batteria unica condivisa fra più inverter.
+- **Sottocarichi**: ogni utenza può avere fino a 6 sottocarichi che ne dettagliano il consumo, ciascuno con il suo storico.
+- **5 lingue**: italiano, inglese, spagnolo, francese e tedesco. La card segue la lingua di Home Assistant, oppure la scegli dall'editor.
 - **Popup con grafico** per ogni cerchio e utenza: potenza, tensione, corrente e carica (SOC).
 - **Tempo stimato** di carica completa o di scarica fino alla carica residua desiderata (imposta la capacità del pacco batterie).
 - **Indicatori** (fino a 18): anelli o tessere con barra, colori a soglie, scale che attraversano lo zero (es. correnti).
@@ -24,9 +26,32 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Editor visuale completo**: non serve scrivere YAML.
 - Adattiva: schermo largo, tablet e telefono.
 
+## Lingue
+
+L'interfaccia della card (card, editor visuale, popup e messaggi) è disponibile in **5 lingue**:
+
+| Lingua | Codice |
+|---|---|
+| Italiano | `it` |
+| English | `en` |
+| Español | `es` |
+| Français | `fr` |
+| Deutsch | `de` |
+
+Per impostazione predefinita la card usa la lingua di Home Assistant. Per forzarne un'altra: editor visuale → **Generale → Lingua**, oppure `language: en` in YAML. Se la lingua di Home Assistant non è fra queste, viene usato l'inglese.
+
 ## Installazione
 
-### Con HACS (consigliata)
+### Con il Marketplace di Home Assistant (2026.11 o successivo)
+
+Dalla versione 2026.11 HACS è integrato in Home Assistant come **Marketplace**.
+
+1. Impostazioni → **Marketplace** → menu ⋮ → **Aggiungi da link**.
+2. Incolla `https://github.com/Memme1989/fv-hud-card`, categoria **Dashboard**, poi **Aggiungi**.
+3. Cerca **FV HUD Card** e premi **Scarica**.
+4. Ricarica il browser (Ctrl+F5).
+
+### Con HACS (versioni precedenti di Home Assistant)
 
 1. HACS → menu ⋮ → **Repository personalizzati**.
 2. Incolla `https://github.com/Memme1989/fv-hud-card`, categoria **Dashboard** (o *Lovelace*), poi **Aggiungi**.
@@ -39,12 +64,15 @@ Se la card ti è utile, puoi offrirmi un caffè:
 2. Impostazioni → Dashboard → ⋮ → **Risorse** → aggiungi `/local/fv-hud-card.js` come **Modulo JavaScript**.
 3. Ricarica il browser.
 
+Se passi dall'installazione manuale al Marketplace, rimuovi prima la risorsa manuale: altrimenti la card viene caricata due volte.
+
 ## Uso
 
 Aggiungi una card manuale con `type: custom:fv-hud-card`, poi configurala dall'editor visuale. Esempio minimo in YAML:
 
 ```yaml
 type: custom:fv-hud-card
+language: it        # it, en, es, fr, de (vuoto = lingua di Home Assistant)
 title: Fotovoltaico
 subtitle: ENERGIA
 solar:
@@ -99,9 +127,11 @@ history:
 
 | Sezione | Cosa configura |
 |---|---|
+| `language` | Lingua dell'interfaccia: `it`, `en`, `es`, `fr`, `de`. Se omessa segue Home Assistant. |
+| `mode`, `inverters` | `mode: multi` e fino a 3 inverter, ciascuno con fase, MPPT, batteria, casa, utenze e impostazioni. `shared_battery: true` per una batteria unica. |
 | `solar`, `grid`, `home` | Entità di potenza (W o kW). `grid` accetta anche tensione e frequenza. |
 | `battery`, `battery2` | Potenza e carica (%). `charging_positive: false` se il tuo sensore ha il segno invertito. Con `battery2` compaiono due batterie affiancate. |
-| `loads` | Utenze con icona, nome e testo secondario (o entità secondaria, es. umidità). |
+| `loads` | Fino a 10 utenze con icona, nome e testo secondario (o entità secondaria, es. umidità). Ognuna può avere `sub_loads` (fino a 6). |
 | `indicators` | Entità con `min`, `max`, `unit`, `decimals` e soglie «da questo valore in su». `indicators_look: tiles` per le tessere. |
 | `axpert` | Impostazioni, interruttori, letture e PIN. |
 | `history` | Serie, intervalli (`24h`, `7g`, `30g`), altezza e stile (`look: areas`). |
@@ -114,7 +144,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.24.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.25.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
@@ -122,7 +152,19 @@ Apri una [issue](https://github.com/Memme1989/fv-hud-card/issues) indicando vers
 
 ## English
 
-FV HUD Card is a full-page Lovelace card for Home Assistant that shows a photovoltaic system as an animated HUD: energy flow (solar, inverter, grid, up to two batteries, up to 10 loads), colour-coded indicators, history on tap, a multi-series power chart, and an inverter control panel (selects, numbers, switches, readings) with an optional PIN. Install via HACS as a custom repository (category *Dashboard*) and configure everything from the visual editor. The interface is currently in Italian.
+FV HUD Card is a full-page Lovelace card for Home Assistant that shows a photovoltaic system as an animated HUD: energy flow (solar, inverter, grid, up to two batteries, up to 4 MPPT, 10 loads in single mode, or up to 3 inverters with 12 loads each in multi mode, plus sub-loads), colour-coded indicators, history on tap, a multi-series power chart, and an inverter control panel (selects, numbers, switches, readings) with an optional PIN. The interface is available in **Italian, English, Spanish, French and German** (it follows the Home Assistant language, or pick one in the editor). Install it from the Home Assistant Marketplace (2026.11+: Settings → Marketplace → ⋮ → *Add from link*) or via HACS as a custom repository (category *Dashboard*), and configure everything from the visual editor.
+
+## Español
+
+FV HUD Card es una tarjeta Lovelace a pantalla completa para Home Assistant que muestra una instalación fotovoltaica como un HUD animado: flujo de energía (solar, inversor, red, baterías y cargas), indicadores con umbrales de color, histórico al tocar y panel de control del inversor con PIN opcional. Modo inversor único o multi inversor (hasta 3). Interfaz en italiano, inglés, español, francés y alemán; sigue el idioma de Home Assistant o se elige en el editor.
+
+## Français
+
+FV HUD Card est une carte Lovelace plein écran pour Home Assistant qui affiche une installation photovoltaïque sous forme de HUD animé : flux d'énergie (solaire, onduleur, réseau, batteries et charges), indicateurs à seuils colorés, historique au toucher et panneau de contrôle de l'onduleur avec code PIN facultatif. Mode onduleur unique ou multi-onduleurs (jusqu'à 3). Interface en italien, anglais, espagnol, français et allemand ; elle suit la langue de Home Assistant ou se choisit dans l'éditeur.
+
+## Deutsch
+
+FV HUD Card ist eine ganzseitige Lovelace-Karte für Home Assistant, die eine Photovoltaikanlage als animiertes HUD darstellt: Energiefluss (Solar, Wechselrichter, Netz, Batterien und Verbraucher), Anzeigen mit farbigen Schwellen, Verlauf per Antippen und Wechselrichter-Bedienfeld mit optionaler PIN. Einzelner Wechselrichter oder Multi-Wechselrichter (bis zu 3). Oberfläche auf Italienisch, Englisch, Spanisch, Französisch und Deutsch; sie folgt der Home-Assistant-Sprache oder wird im Editor gewählt.
 
 ## Licenza
 
