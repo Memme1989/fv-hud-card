@@ -18,6 +18,7 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Sottocarichi**: ogni utenza può avere fino a 6 sottocarichi che ne dettagliano il consumo, ciascuno con il suo storico.
 - **5 lingue**: italiano, inglese, spagnolo, francese e tedesco. La card segue la lingua di Home Assistant, oppure la scegli dall'editor.
 - **Popup con grafico** per ogni cerchio e utenza: potenza, tensione, corrente e carica (SOC).
+- **Energia per periodo (kWh)**: nel popup di fonti, batterie, rete, casa e utenze compare un istogramma con l'energia del **giorno, della settimana, del mese e dell'anno**, con navigazione fra i periodi, scelta della data, confronto con il periodo precedente, totali e saldo (prelievo / immissione, carica / scarica). Richiede un contatore in kWh (vedi sotto).
 - **Tempo stimato** di carica completa o di scarica fino alla carica residua desiderata (imposta la capacità del pacco batterie).
 - **Indicatori** (fino a 18): anelli o tessere con barra, colori a soglie, scale che attraversano lo zero (es. correnti).
 - **Storico** al tocco su qualsiasi indicatore o utenza (24 ore, 7 e 30 giorni), con tooltip.
@@ -77,12 +78,17 @@ title: Fotovoltaico
 subtitle: ENERGIA
 solar:
   entity: sensor.pv_power
+  energy_entity: sensor.pv_energy_total         # opzionale, contatore kWh
 grid:
   entity: sensor.grid_power
   voltage_entity: sensor.grid_voltage
+  energy_entity: sensor.grid_energy_import      # opzionale, contatore kWh
+  energy_out_entity: sensor.grid_energy_export  # opzionale, contatore kWh
 battery:
   entity: sensor.battery_power
   soc_entity: sensor.battery_soc
+  energy_in_entity: sensor.battery_energy_in    # opzionale, contatore kWh
+  energy_out_entity: sensor.battery_energy_out  # opzionale, contatore kWh
   charging_positive: true
   capacity_kwh: 10.24
   min_soc: 20
@@ -138,13 +144,26 @@ history:
 
 Le entità di potenza possono essere in W o kW: la card converte da sola.
 
+### Energia per periodo
+
+Per vedere l'energia in kWh per giorno, settimana, mese e anno, assegna un **contatore di energia** alle voci che ti interessano. Tutti i campi sono opzionali:
+
+| Voce | Campi |
+|---|---|
+| Solare e ogni MPPT | `energy_entity` (energia prodotta) |
+| Rete, e ogni fase in multi inverter | `energy_entity` (prelevata), `energy_out_entity` (immessa) |
+| Batteria, `battery2` e batteria di ogni inverter | `energy_in_entity` (in carica), `energy_out_entity` (in scarica) |
+| Casa, e ogni utenza | `energy_entity` (energia consumata) |
+
+I contatori devono essere sensori con totale che cresce (`state_class: total_increasing` o `total`) e registrati da Home Assistant, perché la card legge le statistiche del recorder. Senza contatore il popup mostra solo il grafico di potenza, come prima.
+
 ## Sicurezza del PIN
 
 Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza**: resta scritto in chiaro nella configurazione della dashboard, visibile a chi può modificarla.
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.25.1. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.26.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
@@ -152,19 +171,19 @@ Apri una [issue](https://github.com/Memme1989/fv-hud-card/issues) indicando vers
 
 ## English
 
-FV HUD Card is a full-page Lovelace card for Home Assistant that shows a photovoltaic system as an animated HUD: energy flow (solar, inverter, grid, up to two batteries, up to 4 MPPT, 10 loads in single mode, or up to 3 inverters with 12 loads each in multi mode, plus sub-loads), colour-coded indicators, history on tap, a multi-series power chart, and an inverter control panel (selects, numbers, switches, readings) with an optional PIN. The interface is available in **Italian, English, Spanish, French and German** (it follows the Home Assistant language, or pick one in the editor). Install it from the Home Assistant Marketplace (2026.11+: Settings → Marketplace → ⋮ → *Add from link*) or via HACS as a custom repository (category *Dashboard*), and configure everything from the visual editor.
+FV HUD Card is a full-page Lovelace card for Home Assistant that shows a photovoltaic system as an animated HUD: energy flow (solar, inverter, grid, up to two batteries, up to 4 MPPT, energy per day / week / month / year from kWh meters, 10 loads in single mode, or up to 3 inverters with 12 loads each in multi mode, plus sub-loads), colour-coded indicators, history on tap, a multi-series power chart, and an inverter control panel (selects, numbers, switches, readings) with an optional PIN. The interface is available in **Italian, English, Spanish, French and German** (it follows the Home Assistant language, or pick one in the editor). Install it from the Home Assistant Marketplace (2026.11+: Settings → Marketplace → ⋮ → *Add from link*) or via HACS as a custom repository (category *Dashboard*), and configure everything from the visual editor.
 
 ## Español
 
-FV HUD Card es una tarjeta Lovelace a pantalla completa para Home Assistant que muestra una instalación fotovoltaica como un HUD animado: flujo de energía (solar, inversor, red, baterías y cargas), indicadores con umbrales de color, histórico al tocar y panel de control del inversor con PIN opcional. Modo inversor único o multi inversor (hasta 3). Interfaz en italiano, inglés, español, francés y alemán; sigue el idioma de Home Assistant o se elige en el editor.
+FV HUD Card es una tarjeta Lovelace a pantalla completa para Home Assistant que muestra una instalación fotovoltaica como un HUD animado: flujo de energía (solar, inversor, red, baterías y cargas), indicadores con umbrales de color, histórico al tocar, energía por día, semana, mes y año (contadores en kWh) y panel de control del inversor con PIN opcional. Modo inversor único o multi inversor (hasta 3). Interfaz en italiano, inglés, español, francés y alemán; sigue el idioma de Home Assistant o se elige en el editor.
 
 ## Français
 
-FV HUD Card est une carte Lovelace plein écran pour Home Assistant qui affiche une installation photovoltaïque sous forme de HUD animé : flux d'énergie (solaire, onduleur, réseau, batteries et charges), indicateurs à seuils colorés, historique au toucher et panneau de contrôle de l'onduleur avec code PIN facultatif. Mode onduleur unique ou multi-onduleurs (jusqu'à 3). Interface en italien, anglais, espagnol, français et allemand ; elle suit la langue de Home Assistant ou se choisit dans l'éditeur.
+FV HUD Card est une carte Lovelace plein écran pour Home Assistant qui affiche une installation photovoltaïque sous forme de HUD animé : flux d'énergie (solaire, onduleur, réseau, batteries et charges), indicateurs à seuils colorés, historique au toucher, énergie par jour, semaine, mois et année (compteurs en kWh) et panneau de contrôle de l'onduleur avec code PIN facultatif. Mode onduleur unique ou multi-onduleurs (jusqu'à 3). Interface en italien, anglais, espagnol, français et allemand ; elle suit la langue de Home Assistant ou se choisit dans l'éditeur.
 
 ## Deutsch
 
-FV HUD Card ist eine ganzseitige Lovelace-Karte für Home Assistant, die eine Photovoltaikanlage als animiertes HUD darstellt: Energiefluss (Solar, Wechselrichter, Netz, Batterien und Verbraucher), Anzeigen mit farbigen Schwellen, Verlauf per Antippen und Wechselrichter-Bedienfeld mit optionaler PIN. Einzelner Wechselrichter oder Multi-Wechselrichter (bis zu 3). Oberfläche auf Italienisch, Englisch, Spanisch, Französisch und Deutsch; sie folgt der Home-Assistant-Sprache oder wird im Editor gewählt.
+FV HUD Card ist eine ganzseitige Lovelace-Karte für Home Assistant, die eine Photovoltaikanlage als animiertes HUD darstellt: Energiefluss (Solar, Wechselrichter, Netz, Batterien und Verbraucher), Anzeigen mit farbigen Schwellen, Verlauf per Antippen, Energie pro Tag, Woche, Monat und Jahr (kWh-Zähler) und Wechselrichter-Bedienfeld mit optionaler PIN. Einzelner Wechselrichter oder Multi-Wechselrichter (bis zu 3). Oberfläche auf Italienisch, Englisch, Spanisch, Französisch und Deutsch; sie folgt der Home-Assistant-Sprache oder wird im Editor gewählt.
 
 ## Licenza
 
