@@ -18,7 +18,7 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Sottocarichi**: ogni utenza può avere fino a 6 sottocarichi che ne dettagliano il consumo, ciascuno con il suo storico.
 - **5 lingue**: italiano, inglese, spagnolo, francese e tedesco. La card segue la lingua di Home Assistant, oppure la scegli dall'editor.
 - **Popup con grafico** per ogni cerchio e utenza: potenza, tensione, corrente e carica (SOC).
-- **Energia per periodo (kWh)**: nel popup di fonti, batterie, rete, casa e utenze compare un istogramma con l'energia del **giorno, della settimana, del mese e dell'anno**, con navigazione fra i periodi, scelta della data, confronto con il periodo precedente, totali e saldo (prelievo / immissione, carica / scarica). Richiede un contatore in kWh (vedi sotto).
+- **Energia per periodo (kWh)**: nel popup di fonti, batterie, rete, casa e utenze compare un istogramma con l'energia del **giorno, della settimana, del mese e dell'anno**, con navigazione fra i periodi, scelta della data, confronto con il periodo precedente, totali e saldo (prelievo / immissione, carica / scarica). Richiede un contatore in kWh (vedi sotto). Con più MPPT o con due batterie puoi usare anche un contatore **totale**: sul punto dove le linee si uniscono compare un pallino cliccabile che apre l'energia complessiva.
 - **Tempo stimato** di carica completa o di scarica fino alla carica residua desiderata (imposta la capacità del pacco batterie).
 - **Indicatori** (fino a 18): anelli o tessere con barra, colori a soglie, scale che attraversano lo zero (es. correnti).
 - **Storico** al tocco su qualsiasi indicatore o utenza (24 ore, 7 e 30 giorni), con tooltip.
@@ -79,6 +79,7 @@ subtitle: ENERGIA
 solar:
   entity: sensor.pv_power
   energy_entity: sensor.pv_energy_total         # opzionale, contatore kWh
+  energy_total_entity: sensor.pv_energy_all     # opzionale, somma di tutti gli MPPT
 grid:
   entity: sensor.grid_power
   voltage_entity: sensor.grid_voltage
@@ -154,8 +155,12 @@ Per vedere l'energia in kWh per giorno, settimana, mese e anno, assegna un **con
 | Rete, e ogni fase in multi inverter | `energy_entity` (prelevata), `energy_out_entity` (immessa) |
 | Batteria, `battery2` e batteria di ogni inverter | `energy_in_entity` (in carica), `energy_out_entity` (in scarica) |
 | Casa, e ogni utenza | `energy_entity` (energia consumata) |
+| Totale di tutti gli MPPT (con 2 o più MPPT) | `solar.energy_total_entity` |
+| Totale delle due batterie | `battery.energy_total_in_entity` (in carica), `battery.energy_total_out_entity` (in scarica) |
 
 I contatori devono essere sensori con totale che cresce (`state_class: total_increasing` o `total`) e registrati da Home Assistant, perché la card legge le statistiche del recorder. Senza contatore il popup mostra solo il grafico di potenza, come prima.
+
+I contatori **totali** servono se hai un solo sensore che somma tutti gli MPPT o le due batterie: sul punto dove le linee si uniscono compare un pallino cliccabile che apre solo il blocco dell'energia (giorno, settimana, mese, anno). Con un solo MPPT o una sola batteria usa invece i campi della voce singola.
 
 ## Sicurezza del PIN
 
@@ -163,7 +168,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.26.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.27.1. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
