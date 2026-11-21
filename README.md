@@ -18,6 +18,8 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Sottocarichi**: ogni utenza può avere fino a 6 sottocarichi che ne dettagliano il consumo, ciascuno con il suo storico.
 - **5 lingue**: italiano, inglese, spagnolo, francese e tedesco. La card segue la lingua di Home Assistant, oppure la scegli dall'editor.
 - **Popup con grafico** per ogni cerchio e utenza: potenza, tensione, corrente e carica (SOC).
+- **Allerta entità non valide (opzionale)**: un triangolo giallo compare sul cerchio o riquadro quando Home Assistant segnala l'entità come `unavailable`, `unknown`, vuota o inesistente. Si attiva per sezione (Rete, MPPT, Batteria, Casa e utenze) da *Allerta entità* nell'editor (`alerts`).
+- **Indicatore «AGGIORNATO … fa» nel popup**: mostra da quanto tempo è stato aggiornato il dato (secondi, minuti, ore), con puntino verde se appena aggiornato.
 - **Pulsante di comando nel popup**: ogni utenza e ogni sottocarico può avere un'entità da comandare (switch, luce, input_boolean, ventilatore, automazione, script, scena, pulsante). Il popup mostra un pulsante per accendere/spegnere, o per avviare nel caso di pulsanti, script e scene, con i nomi che scegli.
 - **Fino a 3 carichi di carica (auto)** per ogni utenza, ad esempio una wallbox con più auto: ognuno ha il suo SOC e un nome a scelta, una scheda nel popup e, sul riquadro, i valori che si alternano ogni 5 secondi (AUTO 1, AUTO 2, AUTO 3).
 - **Energia per periodo (kWh)**: nel popup di fonti, batterie, rete, casa e utenze compare un istogramma con l'energia del **giorno, della settimana, del mese e dell'anno**, con navigazione fra i periodi, scelta della data, confronto con il periodo precedente, totali e saldo (prelievo / immissione, carica / scarica). Richiede un contatore in kWh (vedi sotto). Con più MPPT o con due batterie puoi usare anche un contatore **totale**: sul punto dove le linee si uniscono compare un pallino cliccabile che apre l'energia complessiva.
@@ -140,7 +142,8 @@ history:
 | `mode`, `inverters` | `mode: multi` e fino a 3 inverter, ciascuno con fase, MPPT, batteria, casa, utenze e impostazioni. `shared_battery: true` per una batteria unica. |
 | `solar`, `grid`, `home` | Entità di potenza (W o kW). `grid` accetta anche tensione e frequenza. |
 | `battery`, `battery2` | Potenza e carica (%). `charging_positive: false` se il tuo sensore ha il segno invertito. Con `battery2` compaiono due batterie affiancate. |
-| `loads` | Fino a 10 utenze con icona, nome e testo secondario (o entità secondaria, es. umidità). Ognuna può avere `sub_loads` (fino a 6) e fino a 3 SOC (`soc_entity`, `soc2_entity`, `soc3_entity`, con i nomi `soc_name`, `soc2_name`, `soc3_name`). Con `action_entity` (e i nomi `action_name`, `action_name_on`) il popup mostra un pulsante di comando. |
+| `loads` | Fino a 10 utenze con icona, nome e testo secondario (o entità secondaria, es. umidità). Ognuna può avere `sub_loads` (fino a 6) e fino a 3 SOC (`soc_entity`, `soc2_entity`, `soc3_entity`, con i nomi `soc_name`, `soc2_name`, `soc3_name`). Con `action_entity` (e i nomi `action_name`, `action_name_on`) il popup mostra un pulsante di comando. I campi SOC compaiono nell'editor solo con l'icona `car`. |
+| `alerts` | Allerte entità non valide: `rete`, `mppt`, `battery`, `loads` (ognuno `true`/`false`, default disattivato). Mostra un triangolo giallo se l'entità è non disponibile, sconosciuta o inesistente. |
 | `indicators` | Entità con `min`, `max`, `unit`, `decimals` e soglie «da questo valore in su». `indicators_look: tiles` per le tessere. |
 | `axpert` | Impostazioni, interruttori, letture e PIN. |
 | `history` | Serie, intervalli (`24h`, `7g`, `30g`), altezza e stile (`look: areas`). |
@@ -170,7 +173,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.29.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.30.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
