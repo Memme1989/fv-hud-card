@@ -36,6 +36,12 @@ Se la card ti è utile, puoi offrirmi un caffè:
 
 Qui trovi cosa è stato introdotto in ogni versione, dalla più recente alla più vecchia.
 
+### v1.51.3
+- **Schermi stretti (telefono)**: le pillole in alto (Solare, Rete, Batterie, Bolletta) vanno a capo e non escono più dal bordo; se un testo è troppo lungo viene accorciato con i puntini.
+- La pillola «Immessi oggi» sotto il cerchio Rete va su due righe, così non si sovrappone alle altre voci.
+- In modalità multi inverter su telefono, la spaziatura verticale tra le righe del flusso resta quella normale invece di comprimersi.
+- Titoli delle colonne più equilibrati quando vanno a capo.
+
 ### v1.51.2
 Include anche le modifiche della 1.51.1 (non pubblicata).
 - **Popup bollette più leggibile**: sotto le barre dello storico compare il periodo completo (es. `MAR–APR` per un bimestre, `MAR` per un mese), nella lingua della card, al posto del solo primo mese.
@@ -275,7 +281,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.51.2. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.51.3. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 

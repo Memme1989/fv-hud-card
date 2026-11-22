@@ -5,7 +5,7 @@
  * Installazione: HACS / Marketplace (consigliata) oppure risorsa JavaScript module /local/fv-hud-card.js
  * Uso:  type: custom:fv-hud-card  (si configura dall'editor visuale)
  */
-const FV_VERSION = '1.51.2';
+const FV_VERSION = '1.51.3';
 
 /* ---------- costi e bolletta: fasce orarie, periodi e calcolo ---------- */
 const FV_BILL_LBL = { fixed: ['Energia'], bi: ['F1', 'F23'], night: ['Giorno', 'Notte e festivi'], tiers: ['F1', 'F2', 'F3'] };
@@ -148,8 +148,10 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .kick { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .2em; color: #5fd0ff; }
 .h1 { font-size: 30px; font-weight: 700; margin-top: 2px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { padding: 10px 14px; border-radius: 999px; border: 1px solid; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .08em; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; max-width: 100%; }
+.chip { padding: 10px 14px; border-radius: 999px; border: 1px solid; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .08em; max-width: 100%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 520px) { .chip { padding: 9px 12px; font-size: 10.5px; letter-spacing: .04em; } }
+.cols span { text-wrap: balance; }
 .box { padding: 18px 20px; border-radius: 22px; border: 1px solid rgba(255,255,255,.1); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)); }
 .cols { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .2em; color: #ff8a5c; margin-bottom: 10px; }
 .cols .lc { color: rgba(255,255,255,.6); letter-spacing: .08em; }
@@ -176,7 +178,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .nr .nd .v { font-size: 11.5px; } .nr .nd .s { font-size: 7px; letter-spacing: 0; } .nr .nd .l { font-size: 11px; margin-top: 4px; }
 .nd .eco { position: absolute; left: 50%; top: calc(100% + 30px); transform: translateX(-50%); white-space: nowrap; pointer-events: none; display: flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; border: 1px solid #6ee7b7; background: rgba(8,12,20,.9); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: .06em; }
 .nd .eco span { color: rgba(255,255,255,.6); } .nd .eco b { color: #6ee7b7; font-weight: 700; }
-.nr .nd .eco { top: calc(100% + 22px); font-size: 8.5px; padding: 2px 8px; gap: 4px; }
+.nr .nd .eco { top: calc(100% + 22px); font-size: 8.5px; padding: 3px 10px; gap: 0; flex-direction: column; border-radius: 12px; line-height: 1.25; }
 .bhint { font-size: 11px; color: rgba(255,255,255,.55); line-height: 1.4; }
 .blrow { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: 12px; } .blbar { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; padding: 0; color: inherit; cursor: pointer; }
 .ld { position: absolute; transform: translate(-50%, -50%); width: 24.167%; aspect-ratio: 290 / 64; border-radius: 16px; border: 1.5px solid; background: linear-gradient(90deg, rgba(178,140,255,.12), rgba(8,12,20,.97) 55%); display: flex; align-items: center; gap: 12px; padding: 0 16px; text-align: left; }
@@ -660,7 +662,7 @@ class FvHudCard extends HTMLElement {
     if (this._config.mode === 'multi' && this._config.inverters.length) { this._renderMulti(); return; }
     const c = this._config; const d = this._flowData(); const nar = this._narrow; const C = FV_COL; const f = d.f;
     const n = c.loads.length; const lr = 25; const bats = d.bats; const nb = bats.length; const dense = n > 8; const dual = d.dual;
-    const step = dense ? 62 : 72;
+    const step = dense && !nar ? 62 : 72;
     const last = 45 + Math.max(0, n - 1) * step; const W = nar ? 360 : 1300; const H = nar ? Math.max(400, last + 60) : 680; const sz = nar ? 62 : 100; const cs = nar ? 62 : 130;
     const cy = nar ? (H - 15) / 2 : 340; const ldH = dense ? 58 : 68; const m0 = ldH / 2 + (dense ? 7 : 18);
     /* solare sopra l'inverter (uno o due MPPT affiancati), rete in linea, batterie affiancate sotto con una sola linea verso l'inverter */
