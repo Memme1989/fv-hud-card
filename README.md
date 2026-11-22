@@ -23,7 +23,7 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Pulsante di comando nel popup**: ogni utenza e ogni sottocarico può avere un'entità da comandare (switch, luce, input_boolean, ventilatore, automazione, script, scena, pulsante). Il popup mostra un pulsante per accendere/spegnere, o per avviare nel caso di pulsanti, script e scene, con i nomi che scegli.
 - **Fino a 3 carichi di carica (auto)** per ogni utenza, ad esempio una wallbox con più auto: ognuno ha il suo SOC e un nome a scelta, una scheda nel popup e, sul riquadro, i valori che si alternano ogni 5 secondi (AUTO 1, AUTO 2, AUTO 3).
 - **Energia per periodo (kWh)**: nel popup di fonti, batterie, rete, casa e utenze compare un istogramma con l'energia del **giorno, della settimana, del mese e dell'anno**, con navigazione fra i periodi, scelta della data, confronto con il periodo precedente, totali e saldo (prelievo / immissione, carica / scarica). Richiede un contatore in kWh (vedi sotto). Con più MPPT o con due batterie puoi usare anche un contatore **totale**: sul punto dove le linee si uniscono compare un pallino cliccabile che apre l'energia complessiva.
-- **Costi e bolletta (opzionale)**: stima in tempo reale della prossima bolletta della luce (prezzo fisso, biorario, notte e festivi o a fasce F1/F2/F3 con orari ARERA), proiezione a fine periodo, storico delle bollette con confronto e costo medio al kWh, più il **ricavo dell'energia immessa in rete**. Si attiva dall'editor, sezione *Costi e bolletta* (vedi sotto).
+- **Costi e bolletta (opzionale)**: stima in tempo reale della prossima bolletta della luce (prezzo fisso, biorario, notte e festivi o a fasce F1/F2/F3 con orari ARERA), proiezione a fine periodo, storico delle bollette (anche compilato in automatico a fine periodo) con confronto e costo medio al kWh, più il **ricavo dell'energia immessa in rete**. Si attiva dall'editor, sezione *Costi e bolletta* (vedi sotto).
 - **Tempo stimato** di carica completa o di scarica fino alla carica residua desiderata (imposta la capacità del pacco batterie).
 - **Indicatori** (fino a 18): anelli o tessere con barra, colori a soglie, scale che attraversano lo zero (es. correnti).
 - **Storico** al tocco su qualsiasi indicatore o utenza (24 ore, 7 e 30 giorni), con tooltip.
@@ -35,6 +35,11 @@ Se la card ti è utile, puoi offrirmi un caffè:
 ## Novità per versione
 
 Qui trovi cosa è stato introdotto in ogni versione, dalla più recente alla più vecchia.
+
+### v1.51.0
+- **Storico bollette automatico**: a fine periodo la bolletta chiusa viene aggiunta da sola allo storico come **STIMATA** (calcolata dalle statistiche del contatore con i prezzi impostati, anche se la card non era aperta quel giorno). Se hai impostato la data di partenza, la card recupera anche i periodi già chiusi dopo quella data. Si conservano al massimo 12 mensili o 6 bimestrali, scartando le più vecchie.
+- Le bollette stimate sono salvate nell'archivio dati utente di Home Assistant (per utente, valide su tutti i suoi dispositivi) e si vedono nell'editor (*Costi e bolletta → Storico bollette*): modificandone una con l'importo reale diventa una bolletta inserita a mano. Quelle inserite a mano hanno sempre la precedenza sulle stimate dello stesso periodo.
+- Nel popup e nel grafico le bollette stimate sono riconoscibili dall'etichetta «STIMATA» e dal bordo tratteggiato.
 
 ### v1.50.0
 Include tutte le novità dalla 1.30.0 (le versioni intermedie non sono state pubblicate).
@@ -232,7 +237,7 @@ Dall'editor, sezione *Costi e bolletta*, puoi attivare due funzioni indipendenti
 | `bill.power_kw`, `bill.power_price` | Potenza impegnata (kW) e quota potenza (€/kW al mese). |
 | `bill.vat` | IVA in %, 10 se omessa. |
 | `bill.tv` | Canone TV (€/mese), aggiunto dopo l'IVA. |
-| `bill.history` | Elenco di bollette già pagate: `from`, `to` (escluso), `kwh`, `total`. |
+| `bill.history` | Elenco di bollette già pagate: `from`, `to` (escluso), `kwh`, `total`. A fine periodo la card aggiunge da sola anche le bollette **stimate** (non compaiono nel YAML, sono nell'archivio utente di Home Assistant); se ne modifichi una nell'editor diventa una voce di questo elenco. |
 
 ```yaml
 economy:
@@ -265,7 +270,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.50.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.51.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
