@@ -36,6 +36,11 @@ Se la card ti è utile, puoi offrirmi un caffè:
 
 Qui trovi cosa è stato introdotto in ogni versione, dalla più recente alla più vecchia.
 
+### v1.51.4
+- **Canone TV come in bolletta**: ora si inserisce l'importo **annuale** (`bill.tv_year`, es. 90 €) e viene addebitato in **10 rate da gennaio a ottobre**, quindi nei periodi di novembre e dicembre non compare. Prima veniva calcolato come importo mensile spalmato su tutti i giorni.
+- Compatibilità: se nel YAML hai ancora il vecchio `tv` (€/mese), viene letto come `tv × 10` all'anno.
+- Le bollette stimate già salvate nello storico non vengono ricalcolate: per aggiornarle modificale dall'editor.
+
 ### v1.51.3
 - **Schermi stretti (telefono)**: le pillole in alto (Solare, Rete, Batterie, Bolletta) vanno a capo e non escono più dal bordo; se un testo è troppo lungo viene accorciato con i puntini.
 - La pillola «Immessi oggi» sotto il cerchio Rete va su due righe, così non si sovrappone alle altre voci.
@@ -247,7 +252,7 @@ Dall'editor, sezione *Costi e bolletta*, puoi attivare due funzioni indipendenti
 | `bill.fixed_month` | Quota fissa (€/mese). |
 | `bill.power_kw`, `bill.power_price` | Potenza impegnata (kW) e quota potenza (€/kW al mese). |
 | `bill.vat` | IVA in %, 10 se omessa. |
-| `bill.tv` | Canone TV (€/mese), aggiunto dopo l'IVA. |
+| `bill.tv_year` | Canone TV annuale (€/anno), addebitato in 10 rate da gennaio a ottobre e aggiunto dopo l'IVA. Il vecchio `tv` (€/mese) viene ancora letto come `tv × 10`. |
 | `bill.history` | Elenco di bollette già pagate: `from`, `to` (escluso), `kwh`, `total`. A fine periodo la card aggiunge da sola anche le bollette **stimate** (non compaiono nel YAML, sono nell'archivio utente di Home Assistant); se ne modifichi una nell'editor diventa una voce di questo elenco. |
 
 ```yaml
@@ -268,7 +273,7 @@ economy:
     power_kw: 3
     power_price: 1.7
     vat: 10
-    tv: 9
+    tv_year: 90
     history:
       - { from: "2026-09-01", to: "2026-11-01", kwh: 510, total: 160.8 }
 ```
@@ -281,7 +286,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.51.3. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.51.4. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
