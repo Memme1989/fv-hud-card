@@ -37,6 +37,11 @@ Se la card ti è utile, puoi offrirmi un caffè:
 
 Qui trovi cosa è stato introdotto in ogni versione, dalla più recente alla più vecchia.
 
+### v1.53.0
+- **Multi inverter: pillola «CARICHI»** in alto, accanto a Solare e Rete, con il totale della potenza erogata dagli inverter alla casa.
+- **Multi inverter: percentuale dei carichi sul totale** (Generale → *Percentuale dei carichi sul totale delle uscite degli inverter*, `loads_pct_total: true`). Di default la quota di ogni utenza è calcolata sull'uscita dell'inverter che la alimenta; con questa opzione è calcolata sul totale di tutti gli inverter.
+- **Editor**: le voci dei menu a tendina ora si leggono bene (testo chiaro su sfondo scuro) invece di apparire nere su nero.
+
 ### v1.52.0
 - **Due nuovi aspetti per gli indicatori** (editor → Indicatori → *Aspetto*): **Barra a soglie visibili** (`indicators_look: barsT`) e **Anello a soglie visibili** (`indicators_look: ringT`). Le fasce delle soglie restano sempre visibili, sbiadite, e il riempimento acceso va dallo zero al valore attuale, con il colore della fascia in cui cade. Se la scala attraversa lo zero (es. da -20 a 60) compare un segno bianco sullo zero.
 - **Carichi non monitorati nel popup dei sottocarichi**: sotto i sottocarichi compare una riga tratteggiata rosa con la parte di potenza dell'utenza non coperta dai sottocarichi (W e %), così la somma torna con il totale.
@@ -216,6 +221,7 @@ history:
 | `loads` | Fino a 10 utenze con icona, nome e testo secondario (o entità secondaria, es. umidità). Ognuna può avere `sub_loads` (fino a 6) e fino a 3 SOC (`soc_entity`, `soc2_entity`, `soc3_entity`, con i nomi `soc_name`, `soc2_name`, `soc3_name`). Con `action_entity` (e i nomi `action_name`, `action_name_on`) il popup mostra un pulsante di comando. I campi SOC compaiono nell'editor solo con l'icona `car`. |
 | `alerts` | Allerte entità non valide: `rete`, `mppt`, `battery`, `loads` (ognuno `true`/`false`, default disattivato). Mostra un triangolo giallo se l'entità è non disponibile, sconosciuta o inesistente. |
 | `economy` | Costi e bolletta: `currency`, `export` (ricavo energia immessa) e `bill` (calcolo della bolletta). Vedi [Costi e bolletta](#costi-e-bolletta). |
+| `loads_pct_total` | Solo multi inverter. `true` calcola la quota di ogni utenza sul totale delle uscite di tutti gli inverter, invece che sull'inverter che la alimenta. |
 | `indicators` | Entità con `min`, `max`, `unit`, `decimals` e soglie «da questo valore in su». `indicators_look`: vuoto per l'anello, `tiles` per le tessere con barra, `barsT` per la barra a soglie visibili, `ringT` per l'anello a soglie visibili. |
 | `axpert` | Impostazioni, interruttori, letture e PIN. |
 | `history` | Serie, intervalli (`24h`, `7g`, `30g`), altezza e stile (`look: areas`). |
@@ -291,7 +297,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.52.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.53.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
