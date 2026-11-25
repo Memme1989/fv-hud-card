@@ -28,7 +28,7 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Tempo stimato** di carica completa o di scarica fino alla carica residua desiderata (imposta la capacità del pacco batterie).
 - **Indicatori** (fino a 18): anelli o tessere con barra, colori a soglie, scale che attraversano lo zero (es. correnti).
 - **Storico** al tocco su qualsiasi indicatore o utenza (24 ore, 7 e 30 giorni), con tooltip.
-- **Grafico storico potenze** a più serie (fino a 6).
+- **Grafico storico potenze** a più serie (fino a 6), con cursore, zoom e scorrimento nel tempo.
 - **Pannello inverter**: impostazioni (`select` / `number`), interruttori e letture, con **PIN** opzionale e blocco automatico.
 - **Editor visuale completo**: non serve scrivere YAML.
 - Adattiva: schermo largo, tablet e telefono.
@@ -36,6 +36,15 @@ Se la card ti è utile, puoi offrirmi un caffè:
 ## Novità per versione
 
 Qui trovi cosa è stato introdotto in ogni versione, dalla più recente alla più vecchia.
+
+### v1.53.7
+
+- **Grafico storico potenze con zoom e cursore**: passando il mouse (o il dito) sul grafico compare un cursore con l'ora e, nella legenda in basso, il valore di ogni serie in quel momento.
+- **Zoom**: trascina col mouse per selezionare un intervallo e ingrandirlo; sul telefono si ingrandisce con due dita. Con **Ctrl + rotella** si ingrandisce e rimpicciolisce, con il **doppio click** o il pulsante **RESET** si torna alla vista intera.
+- **Barra di scorrimento**: quando il grafico è ingrandito, una barra sotto il grafico permette di scorrere nel tempo; accanto al titolo compare il fattore di ingrandimento e l'intervallo mostrato.
+- **Scala verticale più adatta** ai dati (kW o W), con un piccolo margine sopra il valore massimo, e orari sull'asse X più dettagliati quando l'intervallo visibile è breve.
+- **Legenda a due colonne**, spostata sotto il grafico, con i valori allineati a destra.
+- Cambiando periodo (24 ore, 7 o 30 giorni) lo zoom si azzera.
 
 ### v1.53.0
 - **Multi inverter: pillola «CARICHI»** in alto, accanto a Solare e Rete, con il totale della potenza erogata dagli inverter alla casa.
@@ -297,7 +306,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.53.0. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.53.7. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
