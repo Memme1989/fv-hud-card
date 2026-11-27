@@ -16,6 +16,7 @@ Se la card ti è utile, puoi offrirmi un caffè:
 - **Indicatori** in quattro aspetti: anello, tessere con barra, barra a soglie visibili e anello a soglie visibili.
 - **Flusso di energia animato**: solare → inverter → casa, rete, una o due batterie e le utenze, con la quota di ciascuna sul consumo e il triangolo dei **carichi non monitorati**.
 - **Singolo o multi inverter**: modalità con un inverter (fino a 4 MPPT, 1-2 batterie, **10 utenze**) oppure fino a 3 inverter, uno per fase, ciascuno con fino a 4 MPPT e **12 utenze** (36 in totale). Supporta anche una batteria unica condivisa fra più inverter.
+- **Carichi trifase** (multi con 3 inverter): fino a 8 carichi alimentati dalle 3 fasi, con il dettaglio di ogni fase, grafici ed energia.
 - **Sottocarichi**: ogni utenza può avere fino a 6 sottocarichi che ne dettagliano il consumo, ciascuno con il suo storico.
 - **5 lingue**: italiano, inglese, spagnolo, francese e tedesco. La card segue la lingua di Home Assistant, oppure la scegli dall'editor.
 - **Popup con grafico** per ogni cerchio e utenza: potenza, tensione, corrente e carica (SOC).
@@ -36,6 +37,18 @@ Se la card ti è utile, puoi offrirmi un caffè:
 ## Novità per versione
 
 Qui trovi cosa è stato introdotto in ogni versione, dalla più recente alla più vecchia.
+
+### v1.63.6
+
+- **Carichi trifase** (solo multi inverter con 3 inverter: L1 = inverter 1, L2 = inverter 2, L3 = inverter 3): nuovo cerchio «Carichi trifase» alimentato dalle 3 fasi, con fino a 8 carichi. Ogni carico mostra potenza totale, quota sul consumo, una barretta con le 3 fasi colorate e il valore di ciascuna fase.
+- Per ogni carico trifase puoi indicare i 3 sensori di fase (L1, L2, L3) oppure un solo sensore totale: in quel caso le fasi sono stimate dividendo per 3 (etichetta **÷3**).
+- Per il totale dei carichi trifase puoi usare i 3 sensori di fase, un sensore totale oppure, senza sensori, la somma dei carichi inseriti. Se imposti sia il totale sia le fasi, la card usa le fasi.
+- **Popup trifase**: toccando il cerchio, un carico o la pillola **CARICHI 3F** si apre il grafico della potenza totale, 3 grafici piccoli delle fasi (toccandone uno si apre il dettaglio della fase), massimo, media ed energia del periodo.
+- **Energia trifase**: contatori di fase in kWh (`energy_l1_entity`, `energy_l2_entity`, `energy_l3_entity`) o contatore totale (`energy_entity`); se mancano, l'energia viene stimata dalla potenza ed è indicata come **STIMATA**.
+- **Popup CARICHI**: totale dei carichi diviso per fase (casa dell'inverter + quota dei carichi trifase su quella fase).
+- **Uscita inverter** (multi inverter): nuovo sensore opzionale della potenza in uscita di ogni inverter (`output.entity`); se vuoto la card la calcola dai flussi.
+- **Carichi non monitorati sul totale** (Generale, `unmonitored_pct_total: true`): la percentuale dei carichi non monitorati è calcolata sul totale dell'impianto invece che sulla casa.
+- Nuova sezione dell'editor **Carichi trifase** (visibile solo in modalità multi inverter).
 
 ### v1.53.7
 
@@ -224,13 +237,15 @@ history:
 | Sezione | Cosa configura |
 |---|---|
 | `language` | Lingua dell'interfaccia: `it`, `en`, `es`, `fr`, `de`. Se omessa segue Home Assistant. |
-| `mode`, `inverters` | `mode: multi` e fino a 3 inverter, ciascuno con fase, MPPT, batteria, casa, utenze e impostazioni. `shared_battery: true` per una batteria unica. |
+| `mode`, `inverters` | `mode: multi` e fino a 3 inverter, ciascuno con fase, MPPT, batteria, casa, uscita (`output`, opzionale), utenze e impostazioni. `shared_battery: true` per una batteria unica. |
 | `solar`, `grid`, `home` | Entità di potenza (W o kW). `grid` accetta anche tensione e frequenza. |
 | `battery`, `battery2` | Potenza e carica (%). `charging_positive: false` se il tuo sensore ha il segno invertito. Con `battery2` compaiono due batterie affiancate. |
 | `loads` | Fino a 10 utenze con icona, nome e testo secondario (o entità secondaria, es. umidità). Ognuna può avere `sub_loads` (fino a 6) e fino a 3 SOC (`soc_entity`, `soc2_entity`, `soc3_entity`, con i nomi `soc_name`, `soc2_name`, `soc3_name`). Con `action_entity` (e i nomi `action_name`, `action_name_on`) il popup mostra un pulsante di comando. I campi SOC compaiono nell'editor solo con l'icona `car`. |
 | `alerts` | Allerte entità non valide: `rete`, `mppt`, `battery`, `loads` (ognuno `true`/`false`, default disattivato). Mostra un triangolo giallo se l'entità è non disponibile, sconosciuta o inesistente. |
 | `economy` | Costi e bolletta: `currency`, `export` (ricavo energia immessa) e `bill` (calcolo della bolletta). Vedi [Costi e bolletta](#costi-e-bolletta). |
 | `loads_pct_total` | Solo multi inverter. `true` calcola la quota di ogni utenza sul totale delle uscite di tutti gli inverter, invece che sull'inverter che la alimenta. |
+| `unmonitored_pct_total` | Solo multi inverter. `true` calcola la percentuale dei carichi non monitorati sul totale dell'impianto invece che sulla casa. |
+| `three_phase` | Solo multi inverter con 3 inverter. Carichi trifase: `name`, `entity` (totale) o `l1_entity`, `l2_entity`, `l3_entity`, contatori `energy_entity` o `energy_l1_entity`…`energy_l3_entity`, e `loads` (fino a 8, ciascuno con `name`, `icon`, `entity` o i 3 sensori di fase e i contatori). |
 | `indicators` | Entità con `min`, `max`, `unit`, `decimals` e soglie «da questo valore in su». `indicators_look`: vuoto per l'anello, `tiles` per le tessere con barra, `barsT` per la barra a soglie visibili, `ringT` per l'anello a soglie visibili. |
 | `axpert` | Impostazioni, interruttori, letture e PIN. |
 | `history` | Serie, intervalli (`24h`, `7g`, `30g`), altezza e stile (`look: areas`). |
@@ -306,7 +321,7 @@ Il PIN serve a evitare tocchi involontari. **Non è una protezione di sicurezza*
 
 ## Compatibilità
 
-Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.53.7. Il numero compare anche nell'editor, nella sezione «Informazioni».
+Funziona con qualsiasi integrazione che fornisca le entità: la card non dipende da una integrazione specifica per Axpert. Versione corrente: 1.63.6. Il numero compare anche nell'editor, nella sezione «Informazioni».
 
 ## Problemi e suggerimenti
 
